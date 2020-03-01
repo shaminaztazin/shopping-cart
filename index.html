@@ -14,7 +14,31 @@
 
    <section>
       <div class="container">
-         <div class="cart">
+         
+
+         <div class="row user-info" id="user-info">
+               <div class="col-md-12 text-center">
+                  <h1>Personal Information</h1><hr><br>
+                  
+               </div>
+               <div class="col-md-2">Name</div>
+               <div class="col-md-10">
+                  <input type="text" name="" id="user-name" class="form-control"><br>
+               </div>
+
+               <div class="col-md-2">Phone Number</div>
+               <div class="col-md-10">
+                  <input type="number" id="user-address" class="form-control"><br>
+               </div>
+           
+               <div class="col-md-12">
+                  <button class="btn btn-info float-right" id="user-info-btn">Submit</button>
+               </div>
+            
+            
+         </div>
+
+         <div class="cart" id="cart">
             <div class="col-md-12 col-lg-10 mx-auto">
                <div class="cart-item">
                   <div class="row">
@@ -25,11 +49,11 @@
 
                      <div class="col-md-5 center-item">
                         <div class="input-group number-spinner">
-                           <button class="btn btn-default"><i class="fas fa-minus"></i></button>
-                           <input type="text" class="form-control text-center" value="1">
-                           <button class="btn btn-default"><i class="fas fa-plus"></i></button>
+                           <button class="btn btn-default decrement-quantity-btn"><i class="fas fa-minus"></i></button>                           
+                           <input type="text" class="form-control text-center quantity" value="1" id="quantity1">
+                           <button class="btn btn-default increment-quantity-btn"><i class="fas fa-plus"></i></button>
                         </div>
-                        <h5>$1219</h5>
+                        <h5>$<span class="price">1219<span></span></h5>
                         <img src="images/remove.png" alt="" class="remove-item">
                      </div>
                   </div>
@@ -43,12 +67,12 @@
                      </div>
                      <div class="col-md-5 center-item">
                         <div class="input-group number-spinner">
-                           <button class="btn btn-default"><i class="fas fa-minus"></i></button>
-                           <input type="text" class="form-control text-center" value="1">
-                           <button class="btn btn-default"><i class="fas fa-plus"></i></button>
+                           <button class="btn btn-default decrement-quantity-btn"><i class="fas fa-minus"></i></button>
+                           <input type="text" class="form-control text-center quantity" value="1" id="quantity2">
+                           <button class="btn btn-default increment-quantity-btn"><i class="fas fa-plus"></i></button>
 
                         </div>
-                        <h5>$59</h5>
+                        <h5>$<span class="price">59</span></h5>
                         <img src="images/remove.png" alt="" class="remove-item">
                      </div>
                   </div>
@@ -59,24 +83,113 @@
 
                      <div class="col-md-8">
                         <h5>Subtotal: </h5>
-                        <h5>Tax:</h5>
+                        <h5>Tax (10% of subtotal):</h5>
                         <h5>Total:</h5>
                      </div>
 
                      <div class="col-md-4 status">
-                        <h5>$1,278</h5>
-                        <h5>$0</h5>
-                        <h5>$1,278</h5>
+                        <h5>$<span id="subtotal">1,278</span></h5>
+                        <h5>$<span id="tax">128</span></h5>
+                        <h5>$<span id="total">1,308</span></h5>
                      </div>
                   </div>
                </div>
                <div class="col-md-12 pt-4 pb-4">
-                  <button type="button" class="btn btn-success check-out">Check Out</button>
+                  <button type="button" class="btn btn-success check-out" id="checkout-btn">Check Out</button>
                </div>
             </div>
          </div>
+
+         
+               
+               
+         </div>
       </div>
-   </section>
+   </section> -->
+
+   <!-- Scripts -->
+   <script>
+
+const userInfoBtn = document.getElementById("user-info-btn");
+const incrementQuantityBtnList = document.querySelectorAll(".increment-quantity-btn");
+const decrementQuantityBtnList = document.querySelectorAll(".decrement-quantity-btn");
+const checkoutBtn = document.getElementById("checkout-btn");
+const finishOrderBtn = document.getElementById("finish-order-btn");
+const userInfo = document.getElementById("user-info");
+const cart = document.getElementById("cart");
+const invoice = document.getElementById("invoice");
+
+// get all single product price
+var prices = [];
+var p = document.querySelectorAll(".price");
+for(var i=0; i<p.length; i++) prices.push(parseInt(p[i].innerText));
+
+
+
+
+userInfoBtn.addEventListener("click", ()=>{
+    
+    userInfo.style.display = "none";
+    cart.style.display  = "block";
+})
+
+//set all the values according to quantity change
+function quantityIncrementOrDecrement(serial, type){
+
+    const quantityElement = document.querySelectorAll(".quantity")[serial];
+    const priceElement = document.querySelectorAll(".price")[serial];
+    const singlePrice = prices[serial];
+    const subTotalElement = document.getElementById("subtotal");
+    const taxElement = document.getElementById("tax");
+    const totalElement = document.getElementById("total");
+
+    var quantityValue = parseInt(quantityElement.value);
+    var priceValue = parseFloat(priceElement.innerText);
+    var subTotalValue = parseFloat(subTotalElement.innerText.replace(",",""));
+    var taxValue = parseFloat(taxElement.innerText);
+    var totalValue = parseFloat(totalElement.innerText);
+    
+
+    if(type === "inc") 
+    {
+        quantityValue++;
+        priceValue += singlePrice;
+        subTotalValue += singlePrice;
+        taxValue = Math.round(subTotalValue * 0.10);
+    }
+    else if( quantityValue > 1){
+        quantityValue--; 
+        priceValue -= singlePrice;
+        subTotalValue -= singlePrice;
+        taxValue = Math.round(subTotalValue * 0.10);
+    }
+    
+    totalValue = subTotalValue + taxValue;
+
+    quantityElement.value = quantityValue;
+    priceElement.innerText = priceValue;
+    subTotalElement.innerText = [subTotalValue.toString().slice(0,1), ",", subTotalValue.toString().slice(1)].join("");
+    taxElement.innerText = taxValue;
+    totalElement.innerText = [totalValue.toString().slice(0,1), ",", totalValue.toString().slice(1)].join("");
+    
+}
+
+
+// increment product quantity
+
+incrementQuantityBtnList[0].addEventListener("click", ()=>{
+    quantityIncrementOrDecrement(0, "inc");
+    
+});
+
+incrementQuantityBtnList[1].addEventListener("click", ()=>{
+    
+    quantityIncrementOrDecrement(1, "inc");
+    
+});
+   </script>
+   
+               
 </body>
 
 </html>
